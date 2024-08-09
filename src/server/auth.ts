@@ -1,13 +1,11 @@
+import bcrypt from 'bcryptjs'
+import { db } from '@/server/db'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import {
     getServerSession,
     type DefaultSession,
     type NextAuthOptions,
 } from 'next-auth'
-import bcrypt from 'bcryptjs'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaClient } from '@prisma/client'
-
-const db = new PrismaClient()
 
 declare module 'next-auth' {
     interface Session extends DefaultSession {
@@ -16,8 +14,6 @@ declare module 'next-auth' {
         } & DefaultSession['user']
     }
 }
-
-const PASSWORD_HASH = await bcrypt.hash('1234', 10)
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -28,50 +24,31 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password' },
             },
             authorize: async (credentials) => {
-                if (!credentials || !credentials.password) {
-                    return null
-                }
+                if (!credentials?.email || !credentials.password) return null
 
                 const user = await db.user.findUnique({
                     where: { email: credentials.email },
                 })
 
-                if (!user) {
-                    return null
+                if (user && user.hashedPassword) {
+                    const isValid = await bcrypt.compare(
+                        credentials.password,
+                        user.hashedPassword
+                    )
+                    console.log('Password is valid:', isValid)
+                    return { id: user.id, email: user.email }
                 }
-
-                const isValid = await bcrypt.compare(
-                    credentials.password,
-                    PASSWORD_HASH
-                )
-
-                if (!isValid) {
-                    return null
-                }
-
-                return { id: user.id, name: user.name, email: user.email }
+                return null
             },
         }),
     ],
-    session: {
-        strategy: 'jwt',
-    },
-    jwt: {
-        secret: process.env.NEXTAUTH_SECRET,
-    },
+    session: { strategy: 'jwt' },
+    jwt: { secret: process.env.NEXTAUTH_SECRET },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async session({ session, token }) {
             if (token?.sub) {
-                const user = await db.user.findUnique({
-                    where: { id: token.sub },
-                })
-                if (user) {
-                    session.user = {
-                        ...session.user,
-                        id: user.id,
-                    }
-                }
+                session.user = { id: token.sub, email: token.email }
             }
             return session
         },
