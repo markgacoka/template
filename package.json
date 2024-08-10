@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "next dev",
-        "postinstall": "npx prettier --write . && prisma generate && prisma migrate dev && prisma migrate deploy",
+        "postinstall": "npx prettier --write . && prisma generate && prisma migrate deploy",
         "start": "next build && next start",
         "postbuild": "next-sitemap"
     },
