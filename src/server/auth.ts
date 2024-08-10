@@ -27,12 +27,12 @@ export const authOptions: NextAuthOptions = {
                     where: { email: credentials.email },
                 })
 
-                if (user && user.hashedPassword) {
+                if (user?.hashedPassword) {
                     const isValid = await bcrypt.compare(credentials.password, user.hashedPassword)
                     if (isValid) {
                         return { id: user.id, email: user.email }
                     }
-                }
+                }                
                 return null
             },
         }),
@@ -52,14 +52,17 @@ export const authOptions: NextAuthOptions = {
             const now = new Date()
             const issuedAt = (token.iat as number) * 1000
             const tokenExpirationDate = addDays(new Date(issuedAt), 1)
-
-            // If the token is older than 24 hours, invalidate the session
-            if (now > tokenExpirationDate) { return {} as DefaultSession }
+        
+            if (now > tokenExpirationDate) {
+                return {} as DefaultSession
+            }
+        
             if (token?.sub) {
                 session.user = { id: token.sub, email: token.email }
-            }
+            }            
+            
             return session
-        },
+        },        
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id

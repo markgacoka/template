@@ -1,4 +1,4 @@
-'use client'
+'use client' // Add this directive to indicate this is a Client Component
 
 import { useState } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
@@ -26,26 +26,26 @@ export default function Home() {
     })
 
     const updatePost = api.post.update.useMutation({
-        onSuccess: () => {
-            utils.post.getAllEntries.invalidate()
+        onSuccess: async () => {
+            await utils.post.getAllEntries.invalidate()
             setEditingPost(null)
         },
     })
-
+    
     const deletePost = api.post.delete.useMutation({
-        onSuccess: () => {
-            utils.post.getAllEntries.invalidate()
+        onSuccess: async () => {
+            await utils.post.getAllEntries.invalidate()
             if (editingPost) {
                 setEditingPost(null)
             }
         },
-    })
+    })    
 
     if (isLoading) return <div>Loading...</div>
     if (error) return <div>Error loading posts</div>
 
-    const handleCreatePost = () => {
-        createPost.mutate(newPost)
+    const handleCreatePost = async () => {
+        await createPost.mutateAsync(newPost)
         setNewPost({ title: '', content: '' })
     }
 
@@ -54,9 +54,9 @@ export default function Home() {
         setEditPostDetails({ title: post.title, content: post.content })
     }
 
-    const handleUpdatePost = () => {
+    const handleUpdatePost = async () => {
         if (editingPost) {
-            updatePost.mutate({ id: editingPost, ...editPostDetails })
+            await updatePost.mutateAsync({ id: editingPost, ...editPostDetails })
         }
     }
 
@@ -67,12 +67,12 @@ export default function Home() {
                     <div>
                         <h2 className="text-xl">Log In</h2>
                         <form
-                            onSubmit={(e) => {
+                            onSubmit={async (e) => {
                                 e.preventDefault()
                                 const formData = new FormData(e.currentTarget)
-                                const email = formData.get('email')
-                                const password = formData.get('password')
-                                signIn('credentials', { redirect: false, email, password })
+                                const email = formData.get('email') as string
+                                const password = formData.get('password') as string
+                                await signIn('credentials', { redirect: false, email, password })
                             }}
                         >
                             <input
@@ -104,7 +104,7 @@ export default function Home() {
                                 Logged in as {session.user?.email}
                             </p>
                             <button
-                                onClick={() => signOut()}
+                                onClick={async () => await signOut()}
                                 className="mt-4 rounded bg-red-500 px-4 py-2 text-white"
                             >
                                 Sign Out
@@ -134,8 +134,8 @@ export default function Home() {
                                                     Edit
                                                 </button>
                                                 <button
-                                                    onClick={() =>
-                                                        deletePost.mutate(
+                                                    onClick={async () =>
+                                                        await deletePost.mutateAsync(
                                                             post.id
                                                         )
                                                     }

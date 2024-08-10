@@ -5,9 +5,9 @@
     "type": "module",
     "scripts": {
         "dev": "next dev",
+        "build": "next build",
         "postinstall": "npx prettier --write . && prisma generate && prisma migrate deploy",
-        "start": "next build && next start",
-        "postbuild": "next-sitemap"
+        "start": "next build && next start"
     },
     "dependencies": {
         "@auth/prisma-adapter": "^1.6.0",
