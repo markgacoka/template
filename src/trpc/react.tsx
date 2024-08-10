@@ -17,7 +17,7 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
             links: [
                 loggerLink({
                     enabled: (_op) => process.env.NODE_ENV === 'development',
-                }),                
+                }),
                 unstable_httpBatchStreamLink({
                     transformer: SuperJSON,
                     url: getBaseUrl() + '/api/trpc',

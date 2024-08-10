@@ -1,7 +1,11 @@
 import bcrypt from 'bcryptjs'
 import { db } from '@/server/db'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { getServerSession, type DefaultSession, type NextAuthOptions } from 'next-auth'
+import {
+    getServerSession,
+    type DefaultSession,
+    type NextAuthOptions,
+} from 'next-auth'
 import { addDays } from 'date-fns'
 
 declare module 'next-auth' {
@@ -28,11 +32,14 @@ export const authOptions: NextAuthOptions = {
                 })
 
                 if (user?.hashedPassword) {
-                    const isValid = await bcrypt.compare(credentials.password, user.hashedPassword)
+                    const isValid = await bcrypt.compare(
+                        credentials.password,
+                        user.hashedPassword
+                    )
                     if (isValid) {
                         return { id: user.id, email: user.email }
                     }
-                }                
+                }
                 return null
             },
         }),
@@ -52,17 +59,17 @@ export const authOptions: NextAuthOptions = {
             const now = new Date()
             const issuedAt = (token.iat as number) * 1000
             const tokenExpirationDate = addDays(new Date(issuedAt), 1)
-        
+
             if (now > tokenExpirationDate) {
                 return {} as DefaultSession
             }
-        
+
             if (token?.sub) {
                 session.user = { id: token.sub, email: token.email }
-            }            
-            
+            }
+
             return session
-        },        
+        },
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
