@@ -96,5 +96,5 @@ npm start
 - [ ] Add SEO improvements
 - [ ] Fix performance and loading text when website is started
 - [ ] Implement themeing i.e. light/dark mode (button on header), inbuilt and custom fonts
-- [ ] Add JWT token limit for auth
-- [x] Demo a few components e.g. toast/sonner, dialog, tooltip, sidecar and dropdown menu - main view split into grids
+- [x] Add JWT token limit for auth
+- [ ] Demo a few components e.g. toast/sonner, dialog, tooltip, sidecar and dropdown menu - main view split into grids

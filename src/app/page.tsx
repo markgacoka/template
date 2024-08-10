@@ -11,6 +11,7 @@ interface Post {
 }
 
 export default function Home() {
+    const utils = api.useUtils()
     const { data: session } = useSession()
     const { data: posts, isLoading, error } = api.post.getAllEntries.useQuery()
     const [newPost, setNewPost] = useState({ title: '', content: '' })
@@ -20,7 +21,6 @@ export default function Home() {
         content: '',
     })
 
-    const utils = api.useUtils()
     const createPost = api.post.create.useMutation({
         onSuccess: () => utils.post.getAllEntries.invalidate(),
     })
