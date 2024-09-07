@@ -4,11 +4,12 @@ const config = {
     parserOptions: {
         project: true,
     },
-    plugins: ['@typescript-eslint'],
+    plugins: ['@typescript-eslint', 'react'],
     extends: [
         'next/core-web-vitals',
         'plugin:@typescript-eslint/recommended-type-checked',
         'plugin:@typescript-eslint/stylistic-type-checked',
+        'plugin:react/recommended'
     ],
     rules: {
         '@typescript-eslint/array-type': 'off',
@@ -35,6 +36,9 @@ const config = {
                 },
             },
         ],
+        'react/react-in-jsx-scope': 'off',
+        'react/prop-types': 'off',
     },
 }
+
 module.exports = config
