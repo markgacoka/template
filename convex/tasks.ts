@@ -1,4 +1,4 @@
-import { mutation } from '@/convex/_generated/server'
+import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
 
 export const createTask = mutation({
@@ -11,6 +11,7 @@ export const createTask = mutation({
             result: '',
             processedChars: new Array(args.vin.length).fill(''),
             lastProcessedIndex: -1,
+            timeTaken: 0,
         })
         return { taskId }
     },
@@ -21,7 +22,8 @@ export const updateTaskProgress = mutation({
         taskId: v.id('tasks'), 
         progress: v.number(), 
         charIndex: v.number(), 
-        processedChar: v.string() 
+        processedChar: v.string(),
+        timeTaken: v.number(),
     },
     handler: async (ctx, args) => {
         const task = await ctx.db.get(args.taskId)
@@ -29,7 +31,6 @@ export const updateTaskProgress = mutation({
 
         const lastProcessedIndex = task.lastProcessedIndex ?? -1
         if (args.charIndex !== lastProcessedIndex + 1) {
-            // Skip this update if it's not the next expected index
             return
         }
 
@@ -45,12 +46,44 @@ export const updateTaskProgress = mutation({
 })
 
 export const completeTask = mutation({
-    args: { taskId: v.id('tasks'), result: v.string() },
+    args: { taskId: v.id('tasks'), result: v.string(), timeTaken: v.number() },
     handler: async (ctx, args) => {
         await ctx.db.patch(args.taskId, { 
             status: 'completed', 
             progress: 100, 
-            result: args.result 
+            result: args.result,
+            timeTaken: args.timeTaken
         })
+    },
+})
+
+export const getTaskProgress = query({
+    args: { taskId: v.id('tasks') },
+    handler: async (ctx, args) => {
+        const task = await ctx.db.get(args.taskId)
+        if (!task) throw new Error('Task not found')
+        return {
+            progress: task.progress,
+            processedChars: task.processedChars,
+            result: task.result,
+            status: task.status,
+            vin: task.vin,
+            lastProcessedIndex: task.lastProcessedIndex ?? -1,
+        }
+    },
+})
+
+export const getPendingTasks = query({
+    handler: async (ctx) => {
+        return await ctx.db
+            .query('tasks')
+            .filter((q) => q.eq(q.field('status'), 'pending'))
+            .collect()
+    },
+})
+
+export const getAllTasks = query({
+    handler: async (ctx) => {
+        return await ctx.db.query('tasks').collect()
     },
 })

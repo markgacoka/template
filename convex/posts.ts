@@ -1,5 +1,11 @@
-import { mutation, query } from '@/convex/_generated/server'
+import { query, mutation } from '@/convex/_generated/server'
 import { v } from 'convex/values'
+
+export const getPosts = query({
+    handler: async (ctx) => {
+        return await ctx.db.query('posts').collect()
+    },
+})
 
 export const createPost = mutation({
     args: { 
@@ -12,8 +18,8 @@ export const createPost = mutation({
             title: args.title,
             content: args.content,
             authorId: args.authorId
-        })
-        return newPostId
+        });
+        return newPostId;
     },
 })
 
