@@ -56,6 +56,27 @@ export const signIn = mutation({
   },
 });
 
+export const refreshToken = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    try {
+      const { payload } = await jose.jwtVerify(args.token, JWT_SECRET);
+      const userId = payload.userId as Id<'users'>;
+      const user = await ctx.db.get(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      const newToken = await new jose.SignJWT({ userId: user._id })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setExpirationTime('1h')
+        .sign(JWT_SECRET);
+      return newToken;
+    } catch (error) {
+      throw new Error('Invalid token');
+    }
+  },
+});
+
 export const verifyToken = mutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {

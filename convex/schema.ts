@@ -12,4 +12,12 @@ export default defineSchema({
         content: v.string(),
         authorId: v.id('users'),
     }),
+    tasks: defineTable({
+        vin: v.string(),
+        status: v.string(),
+        progress: v.number(),
+        result: v.string(),
+        processedChars: v.array(v.string()),
+        lastProcessedIndex: v.optional(v.number()), // Make this optional
+    }),
 });

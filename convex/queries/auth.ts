@@ -17,7 +17,8 @@ export const getUser = query({
       }
       return { userId: user._id, email: user.email, name: user.name };
     } catch (error) {
-      throw new Error('Invalid token');
+      console.error('Token verification failed:', error);
+      return null; // Return null instead of throwing an error
     }
   },
 });
