@@ -1,10 +1,7 @@
 version: '3.8'
 services:
   nextjs:
-    build:
-      context: .
-      args:
-        - CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
+    build: .
     container_name: nextjs
     labels:
       - "traefik.enable=true"

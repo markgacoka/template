@@ -18,12 +18,8 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application source code
 COPY . .
 
-# Environment variables
-ARG CONVEX_DEPLOY_KEY
-ENV CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
-
 # Build the application
-RUN npx convex deploy --cmd 'npm run build'
+RUN npx convex deploy --cmd 'npm run build' -y
 
 ##### STAGE 2: RUNNER #####
 FROM node:18-alpine AS runner
