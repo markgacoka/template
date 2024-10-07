@@ -4,7 +4,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "concurrently \"npx convex dev\" \"npm run next-dev\"",
+        "dev": "npm run next-dev",
+        "deploy": "concurrently \"npx convex dev\" \"npm run next-dev\"",
         "next-dev": "next dev",
         "build": "next build",
         "start": "next start",
@@ -42,7 +43,7 @@
         "jsonwebtoken": "^9.0.2",
         "lucide-react": "^0.427.0",
         "next": "^14.2.4",
-        "next-auth": "^3.29.10",
+        "next-auth": "^4.24.8",
         "next-sitemap": "^4.2.3",
         "next-themes": "^0.3.0",
         "react": "^18.3.1",
