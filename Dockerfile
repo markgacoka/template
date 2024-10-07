@@ -6,10 +6,9 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Copy necessary files
-COPY public ./
+COPY .env ./
 COPY tsconfig.json ./
 COPY next.config.js ./
-COPY .env.production ./
 COPY package.json package-lock.json ./
 
 # Install dependencies
@@ -19,7 +18,6 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the application
-RUN npx convex dev --once
 RUN npx convex deploy --cmd 'npm run build' -y
 
 ##### STAGE 2: RUNNER #####
