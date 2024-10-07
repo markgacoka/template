@@ -43,7 +43,6 @@ This template provides a robust foundation for building fullstack applications u
 ```
 
 ## Installation
-
 ### Clone the repository:
 
 ```
