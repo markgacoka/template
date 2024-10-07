@@ -1,60 +1,82 @@
-version: '3.9'
-
+version: '3.8'
 services:
-  reverse-proxy:
+  nextjs:
+    build: .
+    container_name: nextjs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=myresolver"
+      - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
+    env_file: .env.local
+    networks: [web]
+    deploy:
+      replicas: 3
+    restart: always
+    depends_on: [convex, redis]
+
+  convex:
+    image: convexdev/convex:latest
+    container_name: convex_backend
+    command: "npx convex dev --production"
+    volumes:
+      - ./app:/app
+    env_file: .env.local
+    environment:
+      - CONVEX_DEPLOYMENT_URL=${NEXT_PUBLIC_CONVEX_URL}
+    networks: [web]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  traefik:
     image: traefik:v3.1
+    container_name: traefik
     command:
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker=true"
+      - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=markgacoka@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - letsencrypt:/letsencrypt
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks: [web]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
   redis:
     image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
     restart: always
-
-  app:
-    platform: "linux/amd64"
-    build:
-      context: .
-      dockerfile: Dockerfile
-    working_dir: /app
-    env_file:
-      - .env
-    image: template:latest
-    labels:
-      - "traefik.enable=true"
-    #   - "traefik.http.routers.app.rule=Host(`gacoka.com`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=myresolver"
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
-    deploy:
-      mode: replicated
-      replicas: 3
-    restart: always
-    depends_on:
-      redis:
-        condition: service_healthy
 
 volumes:
   letsencrypt:
   redis-data:
+
+networks:
+  web:
+    driver: bridge
