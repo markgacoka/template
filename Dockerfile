@@ -7,7 +7,7 @@ RUN npm install -g npm@latest
 
 # Copy necessary files
 COPY tsconfig.json ./
-COPY .env.local ./
+COPY .env.production ./
 COPY next.config.js ./
 COPY package.json package-lock.json ./
 
@@ -28,15 +28,16 @@ WORKDIR /app
 # Copy necessary files and directories from the build stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env.local ./.env.local
+COPY --from=builder /app/.env.production ./.env.production
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/convex ./convex
 
 # Set environment variables
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV DOMAIN_NAME=149.28.222.222
 
 # Expose the application's port
 EXPOSE 3000
