@@ -1,25 +1,25 @@
-import { query, mutation } from '@/convex/_generated/server'
+import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
 
-export const getPosts = query({
-    handler: async (ctx) => {
-        return await ctx.db.query('posts').collect()
+export const createPost = mutation({
+    args: { title: v.string(), content: v.string(), userId: v.id('users') },
+    handler: async (ctx, args) => {
+        const postId = await ctx.db.insert('posts', {
+            title: args.title,
+            content: args.content,
+            userId: args.userId,
+        })
+        return postId
     },
 })
 
-export const createPost = mutation({
-    args: { 
-        title: v.string(), 
-        content: v.string(),
-        authorId: v.id('users')
-    },
+export const getPosts = query({
+    args: { userId: v.id('users') },
     handler: async (ctx, args) => {
-        const newPostId = await ctx.db.insert('posts', {
-            title: args.title,
-            content: args.content,
-            authorId: args.authorId
-        });
-        return newPostId;
+        return await ctx.db
+            .query('posts')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .collect()
     },
 })
 

@@ -5,7 +5,7 @@ interface Post {
   _creationTime: number;
   title: string;
   content: string;
-  authorId: Id<"users">;
+  userId: Id<"users">; // Changed from authorId to userId
 }
 
 interface PostListProps {
@@ -16,11 +16,11 @@ export function PostList({ posts }: PostListProps) {
     if (!posts) return null;
 
     return (
-        <div className="space-y-4 overflow-y-auto">
+        <div className="space-y-3 overflow-y-auto">
             {posts.map((post: Post) => (
-                <div key={post._id} className="p-4 border rounded-md">
-                    <h3 className="font-bold">{post.title}</h3>
-                    <p>{post.content}</p>
+                <div key={post._id} className="p-3 border rounded-md">
+                    <h3 className="font-bold text-lg mb-1">{post.title}</h3>
+                    <p className="text-sm">{post.content}</p>
                 </div>
             ))}
         </div>

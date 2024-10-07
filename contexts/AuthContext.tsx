@@ -9,6 +9,7 @@ interface User {
 	userId: Id<"users">;
 	email: string;
 	name?: string;
+	token: string;
 }
 
 interface AuthContextType {
@@ -22,8 +23,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
-	const signIn = useAction(api.auth.signIn);				
-	const createUser = useMutation(api.users.insertUser);
+	const signIn = useAction(api.auth.signInAction);
+	const signUp = useAction(api.auth.signUpAction);
 
 	useEffect(() => {
 		const storedUser = localStorage.getItem('user');
@@ -34,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	const login = async (email: string, password: string) => {
 		const result = await signIn({ email, password });
-		const newUser = { userId: result.userId, email };
+		const newUser = { userId: result.userId, email, name: result.name, token: result.token };
 		localStorage.setItem('user', JSON.stringify(newUser));
 		setUser(newUser);
 	};
@@ -43,9 +44,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		localStorage.removeItem('user');
 		setUser(null);
 	};
+
 	const register = async (email: string, password: string, name?: string) => {
-		const userId = await createUser({ email, passwordHash: password, name });
-		const newUser = { userId, email, name };
+		const result = await signUp({ email, password, name });
+		const newUser = { userId: result.userId, email, name, token: result.token };
 		localStorage.setItem('user', JSON.stringify(newUser));
 		setUser(newUser);
 	};

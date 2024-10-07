@@ -3,34 +3,39 @@
 import bcrypt from "bcryptjs";
 import * as jose from 'jose';
 import { v } from "convex/values";
-import { api } from "@/convex/_generated/api";
-import { action, ActionCtx } from "@/convex/_generated/server";
-import { Id } from "@/convex/_generated/dataModel";
+import { api } from "./_generated/api";
+import { action, ActionCtx } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key')
 
 export const signUpAction = action({
     args: { email: v.string(), password: v.string(), name: v.optional(v.string()) },
-    handler: async (ctx: ActionCtx, args): Promise<{ token: string; userId: string; name?: string }> => {
+    handler: async (ctx: ActionCtx, args): Promise<{ token: string; userId: Id<"users">; name?: string }> => {
+        const existingUser = await ctx.runQuery(api.users.getUserByEmail, { email: args.email })
+        if (existingUser) {
+            throw new Error("User already exists")
+        }
+
         const passwordHash = await bcrypt.hash(args.password, 10)
         const userId = await ctx.runMutation(api.users.insertUser, {
             email: args.email,
             passwordHash,
             name: args.name,
-        });
+        })
 
         const token = await new jose.SignJWT({ userId })
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime('1d')
-            .sign(JWT_SECRET);
+            .sign(JWT_SECRET)
 
-        return { token, userId, name: args.name };
+        return { token, userId, name: args.name }
     },
 });
 
 export const signInAction = action({
     args: { email: v.string(), password: v.string() },
-    handler: async (ctx: ActionCtx, args): Promise<{ token: string; userId: string; name?: string }> => {
+    handler: async (ctx: ActionCtx, args): Promise<{ token: string; userId: Id<"users">; name?: string }> => {
         const user = await ctx.runQuery(api.users.getUserByEmail, { email: args.email });
 
         if (!user) {

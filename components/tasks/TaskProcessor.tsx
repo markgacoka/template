@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
+import { useAuth } from '@/contexts/AuthContext'
+import { FiCheckCircle, FiLoader, FiX, FiSave, FiEdit2, FiTrash2, FiClock } from 'react-icons/fi'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import {
     Dialog,
@@ -12,18 +17,18 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip'
-import {
     Sheet,
     SheetContent,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -32,13 +37,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { VinInput } from './VinInput'
-import { FiEdit2, FiSave, FiX, FiTrash2, FiClock, FiCheckCircle, FiLoader } from 'react-icons/fi'
 
 export function TaskProcessor() {
+    const { user } = useAuth()
     const [taskId, setTaskId] = useState<Id<'tasks'> | null>(null)
     const [editingPost, setEditingPost] = useState<Id<'posts'> | null>(null)
     const [editTitle, setEditTitle] = useState('')
@@ -47,9 +49,11 @@ export function TaskProcessor() {
     const completeTask = useMutation(api.tasks.completeTask)
     const updatePost = useMutation(api.posts.updatePost)
     const deletePost = useMutation(api.posts.deletePost)
+    const deleteTask = useMutation(api.tasks.deleteTask)
+    const createTask = useMutation(api.tasks.createTask)
     const task = useQuery(api.tasks.getTaskProgress, taskId ? { taskId } : 'skip')
-    const posts = useQuery(api.posts.getPosts) || []
-    const allTasks = useQuery(api.tasks.getAllTasks) || []
+    const posts = useQuery(api.posts.getPosts, user ? { userId: user.userId } : 'skip')
+    const allTasks = useQuery(api.tasks.getAllTasks, user ? { userId: user.userId } : 'skip')
 
     useEffect(() => {
         if (task && task.status === 'pending') {
@@ -105,6 +109,10 @@ export function TaskProcessor() {
         await deletePost({ id: postId })
     }
 
+    const handleDeleteTask = async (taskId: Id<'tasks'>) => {
+        await deleteTask({ taskId })
+    }
+
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'completed':
@@ -116,8 +124,15 @@ export function TaskProcessor() {
         }
     }
 
+    const handleCreateTask = async (vin: string) => {
+        if (user) {
+            const { taskId } = await createTask({ vin, userId: user.userId })
+            setTaskId(taskId)
+        }
+    }
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <h2 className="text-2xl font-bold mb-4">Actions</h2>
             <div className="grid grid-cols-2 gap-4">
                 <Dialog>
@@ -148,7 +163,7 @@ export function TaskProcessor() {
                             <SheetTitle>All Posts</SheetTitle>
                         </SheetHeader>
                         <div className="mt-6 space-y-6">
-                            {posts.map((post) => (
+                            {posts?.map((post) => (
                                 <div key={post._id} className="bg-white shadow-md rounded-lg p-6">
                                     {editingPost === post._id ? (
                                         <div className="space-y-4">
@@ -225,12 +240,20 @@ export function TaskProcessor() {
 
             <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Tasks</h3>
-                <div className="space-y-4">
-                    {allTasks.map((task) => (
-                        <div key={task._id} className="bg-white shadow-sm rounded-lg p-4">
+                <div className="space-y-3">
+                    {allTasks?.map((task) => (
+                        <div key={task._id} className="bg-white shadow-sm rounded-lg p-3">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="font-semibold">VIN: {task.vin}</span>
-                                {getStatusIcon(task.status)}
+                                <div className="flex items-center space-x-2">
+                                    {getStatusIcon(task.status)}
+                                    <button
+                                        onClick={() => handleDeleteTask(task._id)}
+                                        className="text-gray-500 hover:text-red-500 transition-colors"
+                                    >
+                                        <FiX className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                             <Progress value={task.progress} className="w-full mb-2" />
                             <div className="flex justify-between text-sm">
@@ -250,7 +273,7 @@ export function TaskProcessor() {
 
             <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Create New Task</h3>
-                <VinInput onTaskCreated={(id) => setTaskId(id as Id<'tasks'>)} />
+                <VinInput onTaskCreated={(id: Id<'tasks'>) => setTaskId(id)} />
             </div>
         </div>
     )

@@ -10,7 +10,7 @@ export default defineSchema({
   posts: defineTable({
     title: v.string(),
     content: v.string(),
-    authorId: v.id('users'),
+    userId: v.id('users'),
   }),
   tasks: defineTable({
     vin: v.string(),
@@ -20,5 +20,6 @@ export default defineSchema({
     processedChars: v.array(v.string()),
     lastProcessedIndex: v.number(),
     timeTaken: v.number(),
+    userId: v.id('users'),
   }),
 });

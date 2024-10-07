@@ -16,6 +16,7 @@ import { PostList } from '@/components/posts/PostList'
 import { MediaEmbed } from '@/components/media/MediaEmbed'
 import { TaskProcessor } from '@/components/tasks/TaskProcessor'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 
 const tabs = [
     { name: 'Create Post', href: '#' },
@@ -25,8 +26,8 @@ const tabs = [
 ]
 
 export default function Home() {
-    const { user } = useAuth()
-    const posts = useQuery(api.posts.getPosts)
+    const { user, logout } = useAuth()
+    const posts = useQuery(api.posts.getPosts, user ? { userId: user.userId } : 'skip')
     const [activeTab, setActiveTab] = useState('Create Post')
 
     if (!user) {
@@ -51,6 +52,10 @@ export default function Home() {
 
     return (
         <div className="container mx-auto p-4">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">Welcome, {user.name || user.email}</h1>
+                <Button onClick={logout} variant="outline">Log out</Button>
+            </div>
             <nav className="border-b border-gray-200">
                 <div className="flex space-x-8">
                     {tabs.map((tab) => (

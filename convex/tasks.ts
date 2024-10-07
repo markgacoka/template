@@ -2,7 +2,7 @@ import { query, mutation } from './_generated/server'
 import { v } from 'convex/values'
 
 export const createTask = mutation({
-    args: { vin: v.string() },
+    args: { vin: v.string(), userId: v.id('users') },
     handler: async (ctx, args) => {
         const taskId = await ctx.db.insert('tasks', {
             vin: args.vin,
@@ -12,6 +12,7 @@ export const createTask = mutation({
             processedChars: new Array(args.vin.length).fill(''),
             lastProcessedIndex: -1,
             timeTaken: 0,
+            userId: args.userId,
         })
         return { taskId }
     },
@@ -83,7 +84,18 @@ export const getPendingTasks = query({
 })
 
 export const getAllTasks = query({
-    handler: async (ctx) => {
-        return await ctx.db.query('tasks').collect()
+    args: { userId: v.id('users') },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query('tasks')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .collect()
+    },
+})
+
+export const deleteTask = mutation({
+    args: { taskId: v.id('tasks') },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.taskId)
     },
 })

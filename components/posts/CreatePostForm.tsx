@@ -14,59 +14,43 @@ export function CreatePostForm() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const handleCreatePost = async () => {
-    if (!user) {
-      toast({
-        title: 'Error',
-        description: 'You must be logged in to create a post.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!title.trim() || !content.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Title and content are required.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      await createPost({ 
-        title, 
-        content, 
-        authorId: user.userId as Id<"users"> 
-      });
-      setTitle('');
-      setContent('');
-      toast({
-        title: 'Post created!',
-        description: 'Your new post has been successfully created.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error creating post',
-        description: 'Please try again later.',
-        variant: 'destructive',
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (user && title && content) {
+      try {
+        await createPost({ title, content, userId: user.userId });
+        setTitle(''); // Clear title input
+        setContent(''); // Clear content input
+        toast({
+          title: 'Post Created',
+          description: 'Your post has been successfully created.',
+          variant: 'default',
+        });
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to create post. Please try again.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <Input
         placeholder="Post Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        required
       />
       <Input
         placeholder="Post Content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        required
       />
-      <Button onClick={handleCreatePost} className="w-full">Create Post</Button>
-    </div>
+      <Button type="submit" className="w-full">Create Post</Button>
+    </form>
   );
 }

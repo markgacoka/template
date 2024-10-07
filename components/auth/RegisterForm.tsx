@@ -15,7 +15,7 @@ export function RegisterForm() {
     e.preventDefault()
     try {
       await register(email, password, name)
-      toast({ title: 'Sign up successful', description: `Welcome, ${name}!` })
+      toast({ title: 'Sign up successful', description: `Welcome, ${name || email}!` })
     } catch (error) {
       toast({
         title: 'Error',
@@ -43,7 +43,7 @@ export function RegisterForm() {
       />
       <Input
         type="text"
-        placeholder="Name"
+        placeholder="Name (optional)"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
