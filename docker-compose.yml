@@ -5,18 +5,11 @@ services:
     container_name: nextjs
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.nextjs.rule=Host(`${NEXTAUTH_URL}`)"
       - "traefik.http.routers.app.entrypoints=websecure"
       - "traefik.http.routers.app.tls.certresolver=myresolver"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
     env_file: .env.local
-    environment:
-      - NODE_ENV=production
-      - CONVEX_DEPLOYMENT=${CONVEX_DEPLOYMENT}
-      - NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXT_PUBLIC_REDIS_URL=${NEXT_PUBLIC_REDIS_URL}
     networks: [web]
     deploy:
       replicas: 3
@@ -30,11 +23,9 @@ services:
     volumes:
       - ./app:/app
     env_file: .env.local
-    environment:
-      - CONVEX_DEPLOYMENT_URL=${NEXT_PUBLIC_CONVEX_URL}
     networks: [web]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4000 || exit 1"]
+      test: ["CMD-SHELL", "nc -z localhost 8080 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -61,7 +52,7 @@ services:
     networks: [web]
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${NEXTAUTH_URL}`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=myresolver"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
