@@ -3,13 +3,16 @@ services:
   nextjs:
     build: .
     container_name: nextjs
+    env_file: .env.local
+    environment:
+      - NODE_ENV=production
+      - DOMAIN_NAME=${DOMAIN_NAME}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`${NEXTAUTH_URL}`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=myresolver"
+      - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.nextjs.entrypoints=websecure"
+      - "traefik.http.routers.nextjs.tls.certresolver=myresolver"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
-    env_file: .env.local
     networks: [web]
     deploy:
       replicas: 3
@@ -29,7 +32,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
+    restart: always
   traefik:
     image: traefik:v3.1
     container_name: traefik
@@ -38,7 +41,6 @@ services:
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=markgacoka@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
       - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
@@ -50,12 +52,6 @@ services:
       - letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks: [web]
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${NEXTAUTH_URL}`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
   redis:
     image: redis:alpine
