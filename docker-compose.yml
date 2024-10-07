@@ -10,11 +10,13 @@ services:
       - "traefik.http.routers.nextjs.entrypoints=websecure"
       - "traefik.http.routers.nextjs.tls.certresolver=myresolver"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
-    networks: [web]
+    networks:
+      - web
     deploy:
       replicas: 3
     restart: always
-    depends_on: [redis]
+    depends_on:
+      - redis
 
   traefik:
     image: traefik:v3.1
@@ -25,16 +27,17 @@ services:
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" # dashboard
+      - "8080:8080" # Dashboard
     volumes:
       - letsencrypt:/letsencrypt
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    networks: [web]
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - web
 
   redis:
     image: redis:alpine
@@ -53,3 +56,7 @@ services:
 volumes:
   letsencrypt:
   redis-data:
+
+networks:
+  web:
+    driver: bridge
