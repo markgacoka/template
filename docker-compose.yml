@@ -4,6 +4,8 @@ services:
     build: .
     container_name: nextjs
     env_file: .env.production
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
