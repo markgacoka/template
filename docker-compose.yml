@@ -3,10 +3,10 @@ services:
   nextjs:
     build: .
     container_name: nextjs
-    env_file: .env.local
+    env_file: .env.production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`149.28.222.222`)"
+      - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
       - "traefik.http.routers.nextjs.entrypoints=websecure"
       - "traefik.http.routers.nextjs.tls.certresolver=myresolver"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
@@ -14,22 +14,8 @@ services:
     deploy:
       replicas: 3
     restart: always
-    depends_on: [convex, redis]
+    depends_on: [redis]
 
-  convex:
-    image: convexdev/convex:latest
-    container_name: convex_backend
-    command: "npx convex deploy --production"
-    volumes:
-      - ./app:/app
-    env_file: .env.local
-    networks: [web]
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 8080 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
   traefik:
     image: traefik:v3.1
     container_name: traefik
@@ -44,7 +30,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      - "8080:8080" # dashboard
     volumes:
       - letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -67,7 +53,3 @@ services:
 volumes:
   letsencrypt:
   redis-data:
-
-networks:
-  web:
-    driver: bridge
