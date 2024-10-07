@@ -1,6 +1,5 @@
 import { query, mutation } from "@/convex/_generated/server"
 import { v } from "convex/values"
-import { Id } from "@/convex/_generated/dataModel"
 
 export const getUserByEmail = query({
     args: { email: v.string() },

@@ -37,6 +37,7 @@ if (typeof window === 'undefined') {
                 progress: ((i + 1) / vin.length) * 100,
                 charIndex: i,
                 processedChar: vin[i].toUpperCase(),
+                timeTaken: 0
             })
 
             await job.updateProgress(((i + 1) / vin.length) * 100)
@@ -45,6 +46,7 @@ if (typeof window === 'undefined') {
         await convex.mutation(api.tasks.completeTask, {
             taskId,
             result: `Processed VIN: ${vin.toUpperCase()}`,
+            timeTaken: 0
         })
     }, { connection: redis })
 }
@@ -73,12 +75,14 @@ export function taskProcessor(taskId: Id<'tasks'> | null) {
                 progress: ((i + 1) / vin.length) * 100,
                 charIndex: i,
                 processedChar: vin[i].toUpperCase(),
+                timeTaken: 0
             })
         }
 
         await completeTask({
             taskId,
             result: `Processed VIN: ${vin.toUpperCase()}`,
+            timeTaken: 0
         })
     }, [taskId, task, updateTaskProgress, completeTask])
 

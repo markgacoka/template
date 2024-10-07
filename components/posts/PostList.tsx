@@ -5,7 +5,7 @@ interface Post {
   _creationTime: number;
   title: string;
   content: string;
-  userId: Id<"users">; // Changed from authorId to userId
+  userId: Id<"users">;
 }
 
 interface PostListProps {

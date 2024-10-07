@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Id } from '@/convex/_generated/dataModel';
 
 export function CreatePostForm() {
   const [title, setTitle] = useState('');
