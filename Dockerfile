@@ -17,9 +17,12 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application source code
 COPY . .
 
+# Set the CONVEX_DEPLOY_KEY environment variable
+ARG CONVEX_DEPLOY_KEY
+ENV CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
+
 # Generate Convex schema and build the application
-RUN npx convex deploy
-RUN npm run build
+RUN npx convex deploy --cmd 'npm run build'
 
 ##### STAGE 2: RUNNER #####
 FROM node:18-alpine AS runner
@@ -37,7 +40,10 @@ COPY --from=builder /app/convex ./convex
 # Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DOMAIN_NAME=149.28.222.222
+
+# Set the CONVEX_DEPLOY_KEY environment variable
+ARG DOMAIN_NAME
+ENV DOMAIN_NAME=${DOMAIN_NAME}
 
 # Expose the application's port
 EXPOSE 3000
