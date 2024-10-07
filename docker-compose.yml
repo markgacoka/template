@@ -3,14 +3,11 @@ services:
   nextjs:
     build:
       context: .
-      args:
-        CONVEX_DEPLOY_KEY: ${CONVEX_DEPLOY_KEY}
-        DOMAIN_NAME: ${DOMAIN_NAME}
     container_name: nextjs
     env_file: .env.production
     environment:
-      - CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
-      - DOMAIN_NAME=${DOMAIN_NAME}
+      - CONVEX_DEPLOY_KEY
+      - DOMAIN_NAME
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
