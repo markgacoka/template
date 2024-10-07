@@ -3,8 +3,9 @@ services:
   nextjs:
     build:
       context: .
+      args:
+        - CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
     container_name: nextjs
-    env_file: .env.production
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
@@ -60,3 +61,6 @@ volumes:
 networks:
   web:
     driver: bridge
+
+env_file:
+  - .env.production

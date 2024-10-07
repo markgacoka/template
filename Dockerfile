@@ -6,9 +6,10 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Copy necessary files
+COPY public ./
 COPY tsconfig.json ./
 COPY next.config.js ./
-COPY /convex ./convex
+COPY .env.production ./
 COPY package.json package-lock.json ./
 
 # Install dependencies
@@ -17,8 +18,12 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application source code
 COPY . .
 
+# Environment variables
+ARG CONVEX_DEPLOY_KEY
+ENV CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}
+
 # Build the application
-RUN npm run build
+RUN npx convex deploy --cmd 'npm run build'
 
 ##### STAGE 2: RUNNER #####
 FROM node:18-alpine AS runner
@@ -30,7 +35,6 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
-
 
 # Set environment variables
 ENV NODE_ENV=production
