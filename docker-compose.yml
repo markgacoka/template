@@ -3,7 +3,7 @@ services:
   nextjs:
     build: .
     container_name: nextjs
-    env_file: .env.production
+    env_file: .env
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - CONVEX_DEPLOY_KEY=${CONVEX_DEPLOY_KEY}

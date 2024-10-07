@@ -7,7 +7,7 @@ RUN npm install -g npm@latest
 
 # Copy necessary files
 COPY tsconfig.json ./
-COPY .env.production ./
+COPY .env.production ./.env
 COPY next.config.js ./
 COPY package.json package-lock.json ./
 
@@ -31,7 +31,7 @@ WORKDIR /app
 # Copy necessary files and directories from the build stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env.production ./.env.production
+COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
@@ -41,7 +41,7 @@ COPY --from=builder /app/convex ./convex
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Set the CONVEX_DEPLOY_KEY environment variable
+# Set the DOMAIN_NAME environment variable
 ARG DOMAIN_NAME
 ENV DOMAIN_NAME=${DOMAIN_NAME}
 
