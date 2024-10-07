@@ -19,6 +19,8 @@ services:
     restart: always
     depends_on:
       - redis
+    env_file:
+      - .env.production
 
   traefik:
     image: traefik:v3.1
@@ -61,6 +63,3 @@ volumes:
 networks:
   web:
     driver: bridge
-
-env_file:
-  - .env.production
