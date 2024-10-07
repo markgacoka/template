@@ -19,6 +19,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the application
+npx convex dev --once
 RUN npx convex deploy --cmd 'npm run build' -y
 
 ##### STAGE 2: RUNNER #####
