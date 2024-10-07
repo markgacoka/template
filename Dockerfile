@@ -8,6 +8,7 @@ RUN npm install -g npm@latest
 # Copy necessary files
 COPY tsconfig.json ./
 COPY next.config.js ./
+COPY /convex ./convex
 COPY package.json package-lock.json ./
 
 # Install dependencies
@@ -29,7 +30,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/convex ./convex
+
 
 # Set environment variables
 ENV NODE_ENV=production

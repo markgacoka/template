@@ -5,9 +5,6 @@ services:
       context: .
     container_name: nextjs
     env_file: .env.production
-    environment:
-      - CONVEX_DEPLOY_KEY
-      - DOMAIN_NAME
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
