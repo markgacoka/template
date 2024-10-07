@@ -12,13 +12,13 @@ COPY next.config.js ./
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
 
 # Generate Convex schema and build the application
-RUN npx convex dev --once
+RUN npx convex deploy
 RUN npm run build
 
 ##### STAGE 2: RUNNER #####
@@ -32,6 +32,7 @@ COPY --from=builder /app/.env.local ./.env.local
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/convex ./convex
 
 # Set environment variables
 ENV NODE_ENV production
@@ -41,4 +42,4 @@ ENV NEXT_TELEMETRY_DISABLED 1
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]

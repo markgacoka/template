@@ -19,7 +19,7 @@ services:
   convex:
     image: convexdev/convex:latest
     container_name: convex_backend
-    command: "npx convex dev --production"
+    command: "npx convex deploy --production"
     volumes:
       - ./app:/app
     env_file: .env.local
