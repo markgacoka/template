@@ -9,6 +9,8 @@ RUN npm install -g npm@latest
 COPY .env ./
 COPY tsconfig.json ./
 COPY next.config.js ./
+COPY convex.json ./
+COPY convex ./convex
 COPY package.json package-lock.json ./
 
 # Install dependencies
@@ -28,6 +30,7 @@ WORKDIR /app
 # Copy necessary files and directories from the build stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/convex ./convex
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
