@@ -18,7 +18,8 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the application
-RUN npx convex deploy --cmd 'npm run build' -y
+# RUN npx convex deploy --cmd 'npm run build' -y
+RUN npm run build
 
 ##### STAGE 2: RUNNER #####
 FROM node:18-alpine AS runner

@@ -1,8 +1,6 @@
-version: '3.8'
 services:
   nextjs:
     build: .
-    container_name: nextjs
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${DOMAIN_NAME}`)"
