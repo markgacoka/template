@@ -1,13 +1,11 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from 'convex/react'
 import { useAuth } from '@/contexts/AuthContext'
-
-// Convex
+import { useTheme } from 'next-themes'
+import { FaSun, FaMoon } from 'react-icons/fa'
 import { api } from '@/convex/_generated/api'
-
-// Components
 import { Toaster } from '@/components/ui/toaster'
 import { LoginForm } from '@/components/auth/LoginForm'
 import { RegisterForm } from '@/components/auth/RegisterForm'
@@ -26,9 +24,14 @@ const tabs = [
 ]
 
 export default function Home() {
+    const { theme, setTheme } = useTheme()
     const { user, logout } = useAuth()
     const posts = useQuery(api.posts.getPosts, user ? { userId: user.userId } : 'skip')
     const [activeTab, setActiveTab] = useState('Create Post')
+
+    useEffect(() => {
+        if (!theme) setTheme('light')
+    }, [theme, setTheme])
 
     if (!user) {
         return (
@@ -53,10 +56,15 @@ export default function Home() {
     return (
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Welcome, {user.name || user.email}</h1>
-                <Button onClick={logout} variant="outline">Log out</Button>
+                <h1 className="text-2xl font-bold text-foreground">Welcome, {user.name || user.email}</h1>
+                <div className="flex items-center space-x-2">
+                    <Button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} variant="outline">
+                        {theme === 'light' ? <FaMoon className="text-foreground" /> : <FaSun className="text-foreground" />}
+                    </Button>
+                    <Button onClick={logout} variant="outline">Log out</Button>
+                </div>
             </div>
-            <nav className="border-b border-gray-200">
+            <nav className="border-b border-border">
                 <div className="flex space-x-8">
                     {tabs.map((tab) => (
                         <button
@@ -64,9 +72,9 @@ export default function Home() {
                             onClick={() => setActiveTab(tab.name)}
                             className={`${
                                 tab.name === activeTab
-                                    ? 'border-indigo-500 text-indigo-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
                         >
                             {tab.name}
                         </button>

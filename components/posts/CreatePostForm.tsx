@@ -7,33 +7,33 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function CreatePostForm() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const createPost = useMutation(api.posts.createPost);
-  const { toast } = useToast();
-  const { user } = useAuth();
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const createPost = useMutation(api.posts.createPost)
+  const { toast } = useToast()
+  const { user } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (user && title && content) {
       try {
-        await createPost({ title, content, userId: user.userId });
-        setTitle(''); // Clear title input
-        setContent(''); // Clear content input
+        await createPost({ title, content, userId: user.userId })
+        setTitle('')
+        setContent('')
         toast({
           title: 'Post Created',
           description: 'Your post has been successfully created.',
           variant: 'default',
-        });
+        })
       } catch (error) {
         toast({
           title: 'Error',
           description: 'Failed to create post. Please try again.',
           variant: 'destructive',
-        });
+        })
       }
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,14 +42,16 @@ export function CreatePostForm() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+        className="bg-background text-foreground"
       />
       <Input
         placeholder="Post Content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         required
+        className="bg-background text-foreground"
       />
       <Button type="submit" className="w-full">Create Post</Button>
     </form>
-  );
+  )
 }

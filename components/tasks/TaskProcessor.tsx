@@ -132,41 +132,35 @@ export function TaskProcessor() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <h2 className="text-2xl font-bold mb-4">Actions</h2>
             <div className="grid grid-cols-2 gap-4">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                            Open Dialog
-                        </Button>
+                        <Button variant="outline" className="w-full">Open Dialog</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Important Information</DialogTitle>
-                            <DialogDescription>
-                                Here is some realistic and important information that is relevant
-                                to the context of this application.
-                            </DialogDescription>
+                            <DialogTitle>Dialog Title</DialogTitle>
+                            <DialogDescription>This is a dialog description.</DialogDescription>
                         </DialogHeader>
+                        <p>Dialog content goes here.</p>
                     </DialogContent>
                 </Dialog>
 
                 <Sheet>
                     <SheetTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                            View Posts
-                        </Button>
+                        <Button variant="outline" className="w-full">Open Sheet</Button>
                     </SheetTrigger>
                     <SheetContent>
                         <SheetHeader>
-                            <SheetTitle>All Posts</SheetTitle>
+                            <SheetTitle>Sheet Title</SheetTitle>
                         </SheetHeader>
-                        <div className="mt-6 space-y-6">
+                        <div className="space-y-4 mt-4">
                             {posts?.map((post) => (
-                                <div key={post._id} className="bg-white shadow-md rounded-lg p-6">
+                                <div key={post._id} className="bg-card text-card-foreground p-4 rounded-lg shadow">
                                     {editingPost === post._id ? (
-                                        <div className="space-y-4">
+                                        <div className="space-y-2">
                                             <Input
                                                 value={editTitle}
                                                 onChange={(e) => setEditTitle(e.target.value)}
@@ -192,7 +186,7 @@ export function TaskProcessor() {
                                     ) : (
                                         <>
                                             <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                                            <p className="text-gray-600 mb-4">{post.content}</p>
+                                            <p className="text-muted-foreground mb-4">{post.content}</p>
                                             <div className="flex justify-end space-x-2">
                                                 <Button onClick={() => handleEditPost(post)} variant="outline" size="sm">
                                                     <FiEdit2 className="mr-2" /> Edit
@@ -212,9 +206,7 @@ export function TaskProcessor() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="outline" className="w-full">
-                                Hover for Info
-                            </Button>
+                            <Button variant="outline" className="w-full">Hover for Info</Button>
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>This is a helpful tooltip!</p>
@@ -224,9 +216,7 @@ export function TaskProcessor() {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                            Open Dropdown
-                        </Button>
+                        <Button variant="outline" className="w-full">Open Dropdown</Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuLabel>Options</DropdownMenuLabel>
@@ -239,17 +229,17 @@ export function TaskProcessor() {
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-xl font-semibold">Tasks</h3>
+                <h3 className="text-xl font-semibold text-foreground">Tasks</h3>
                 <div className="space-y-3">
                     {allTasks?.map((task) => (
-                        <div key={task._id} className="bg-white shadow-sm rounded-lg p-3">
+                        <div key={task._id} className="bg-accent text-card-foreground border border-accent rounded-lg p-3">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="font-semibold">VIN: {task.vin}</span>
                                 <div className="flex items-center space-x-2">
                                     {getStatusIcon(task.status)}
                                     <button
                                         onClick={() => handleDeleteTask(task._id)}
-                                        className="text-gray-500 hover:text-red-500 transition-colors"
+                                        className="text-muted-foreground hover:text-destructive transition-colors"
                                     >
                                         <FiX className="w-4 h-4" />
                                     </button>
