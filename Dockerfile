@@ -14,7 +14,7 @@ COPY convex ./convex
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install --production=false --force
 
 # Copy the rest of the application source code
 COPY . .
