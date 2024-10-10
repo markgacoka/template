@@ -35,7 +35,4 @@ env.local.bak
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
-# Convex
-/convex/_generated
