@@ -9,7 +9,6 @@ RUN npm install -g npm@latest
 COPY .env ./
 COPY tsconfig.json ./
 COPY next.config.js ./
-COPY convex.json ./
 COPY convex ./convex
 COPY package.json package-lock.json ./
 
